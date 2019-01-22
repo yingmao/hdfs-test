@@ -45,12 +45,12 @@ os.system("sed -i '/export JAVA_HOME/s/${JAVA_HOME}/\/usr\/lib\/jvm\/default-jav
 coreSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
-    <!-- 默认HDFS的ip以及端口 -->
+    <!-- Default HDFS ip and port -->
     <property>
          <name>fs.defaultFS</name>
          <value>hdfs://%(mip)s:9000</value>
     </property>
-    <!-- 默认的RPC绑定的IP，这里指定0.0.0.0表示全部ip-->
+    <!-- default RPC IP，and use 0.0.0.0 to represent all ips-->
     <property>
 	<name>dfs.namenode.rpc-bind-host</name>
 	<value>0.0.0.0</value>
@@ -62,16 +62,16 @@ hdfsSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
 
-    <property>  
-       <name>dfs.permissions</name>  
-      <value>false</value>  
+    <property>
+       <name>dfs.permissions</name>
+      <value>false</value>
    </property>
- 
+
     <property>
         <name>dfs.namenode.http-address</name>
         <value>0.0.0.0:50070</value>
     </property>
- 
+
     <property>
         <name>dfs.namenode.secondary.http-address</name>
         <value>0.0.0.0:50090</value>

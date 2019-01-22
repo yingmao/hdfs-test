@@ -11,5 +11,6 @@ do
         echo "Setup $line"
         ssh root@$line -n "cd /hdfs-test/ && python3 setup.py"
         echo "Finished config node $line"
+        echo "########################################################"
     fi
 done
