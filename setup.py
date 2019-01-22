@@ -22,7 +22,7 @@ os.system("rm -rf /usr/local/hadoop-2.9.2/ && unlink /usr/local/hadoop && rm -rf
 os.system("sed -i /JAVA_HOME/d /root/.bashrc && sed -i /hadoop/d /root/.bashrc && sed -i /StrictHostKeyChecking/d /etc/ssh/ssh_config")
 
 #config env
-os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/' >> /root/.bashrc")
+os.system("echo 'export JAVA_HOME=/usr/lib/jvm/default-java/' >> /root/.bashrc")
 os.system("echo 'export PATH=$PATH:/usr/local/hadoop/bin/:/usr/local/hadoop/sbin/' >> /root/.bashrc")
 #config ssh
 os.system("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
@@ -39,16 +39,18 @@ os.system("tar -xzf /hadoop-2.9.2.tar.gz -C /usr/local/ && ln -s /usr/local/hado
 print("Finished Install Hadoop 2.9.2....")
 
 print("Config Hadoop 2.9.2 ...")
-os.system("sed -i '/export JAVA_HOME/s/${JAVA_HOME}/\/usr\/lib\/jvm\/java-8-openjdk-amd64\//g' /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
+os.system("sed -i '/export JAVA_HOME/s/${JAVA_HOME}/\/usr\/lib\/jvm\/default-java\//g' /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
 
 #core-site.xml
 coreSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
+    <!-- 默认HDFS的ip以及端口 -->
     <property>
          <name>fs.defaultFS</name>
          <value>hdfs://%(mip)s:9000</value>
     </property>
+    <!-- 默认的RPC绑定的IP，这里指定0.0.0.0表示全部ip-->
     <property>
 	<name>dfs.namenode.rpc-bind-host</name>
 	<value>0.0.0.0</value>
