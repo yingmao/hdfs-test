@@ -1,15 +1,15 @@
 #!/bin/sh
 export PATH=$PATH:/usr/local/hadoop/bin/
-echo 'make a 2G file...'
-dd if=/dev/zero  of=file2g.data bs=1M count=2048
+echo 'make a 1G file...'
+dd if=/dev/zero  of=file1g.data bs=1M count=1024
 echo "Startup Hadoop hdfs...."
 #启动hdfs
 /usr/local/hadoop/sbin/start-dfs.sh
 echo "Finished Startup Haoop hdfs"
 echo 'mkdir ...'
 hdfs dfs -mkdir /testfile/
-echo 'uploading 2g file'
-hdfs dfs -copyFromLocal file2g.data /testfile/file2g.data
+echo 'uploading 1g file'
+hdfs dfs -copyFromLocal file1g.data /testfile/file1g.data
 echo 'list files'
 hdfs dfs -ls /testfile/
 echo 'remove dir'
