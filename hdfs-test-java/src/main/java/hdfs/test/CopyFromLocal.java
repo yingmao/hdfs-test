@@ -3,9 +3,6 @@ package hdfs.test;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-/**
- * Created by xiaoweiliang on 2019/1/17.
- */
 public class CopyFromLocal {
     public static void main( String[] args ) throws Exception
     {

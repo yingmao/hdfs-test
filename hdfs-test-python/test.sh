@@ -7,13 +7,13 @@ echo "Startup Hadoop hdfs...."
 /usr/local/hadoop/sbin/start-dfs.sh
 echo "Finished Startup Haoop hdfs"
 echo 'mkdir ...'
-hdfs dfs -mkdir /testfile/
+python hdfs-mkdir.py /testfile/
 echo 'uploading 1g file'
-hdfs dfs -copyFromLocal file1g.data /testfile/file1g.data
+python hdfs-copy-from-local.py file1g.data /testfile/file1g.data
 echo 'list files'
-hdfs dfs -ls /testfile/
+python hdfs-list.py /testfile/
 echo 'remove dir'
-hdfs dfs -rm -r /testfile/
+python hdfs-delete.py /testfile/
 echo 'Finished!'
 rm -rf file1g.data
 echo "Shutdown Hadoop hdfs..."

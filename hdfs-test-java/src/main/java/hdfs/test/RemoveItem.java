@@ -4,9 +4,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-/**
- * Created by xiaoweiliang on 2019/1/17.
- */
 public class RemoveItem {
 
     public static void main( String[] args ) throws Exception

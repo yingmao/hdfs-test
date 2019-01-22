@@ -5,9 +5,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 
-/**
- * Created by xiaoweiliang on 2019/1/17.
- */
 public class ListFiles {
 
     public static void main( String[] args ) throws Exception

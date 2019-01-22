@@ -1,1 +1,1 @@
-hdfs_host="node-0:50070"
+hdfs_host="127.0.0.1:50070"

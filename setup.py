@@ -11,7 +11,7 @@ def writeHadoopConfigFile(name,xml):
 mf = open("master","r")
 sf = open("slaves","r")
 mip = mf.read().strip()
-sip = sf.read()
+sip = sf.read().replace("-","")
 mf.close()
 sf.close()
 

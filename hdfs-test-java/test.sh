@@ -1,5 +1,6 @@
 #!/bin/sh
-export PATH=$PATH:/usr/local/hadoop/bin/
+mvn clean package
+cp target/hdfs-test-1.0-SNAPSHOT.jar target/lib/
 echo 'make a 1G file...'
 dd if=/dev/zero  of=file1g.data bs=1M count=1024
 echo "Startup Hadoop hdfs...."
@@ -7,15 +8,16 @@ echo "Startup Hadoop hdfs...."
 /usr/local/hadoop/sbin/start-dfs.sh
 echo "Finished Startup Haoop hdfs"
 echo 'mkdir ...'
-hdfs dfs -mkdir /testfile/
+java -classpath "target/lib/*" hdfs.test.CreateDir /testfile/
 echo 'uploading 1g file'
-hdfs dfs -copyFromLocal file1g.data /testfile/file1g.data
+java -classpath "target/lib/*" hdfs.test.CopyFromLocal file1g.data /testfile/file1g.data
 echo 'list files'
-hdfs dfs -ls /testfile/
+java -classpath "target/lib/*" hdfs.test.ListFiles /testfile/
 echo 'remove dir'
-hdfs dfs -rm -r /testfile/
+java -classpath "target/lib/*" hdfs.test.RemoveItem /testfile/
 echo 'Finished!'
 rm -rf file1g.data
+rm -rf target
 echo "Shutdown Hadoop hdfs..."
 #停止hdfs
 /usr/local/hadoop/sbin/stop-dfs.sh

@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-/**
- * Created by xiaoweiliang on 2019/1/17.
- */
 public class CatFile {
 
 

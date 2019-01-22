@@ -5,9 +5,6 @@ import org.apache.hadoop.conf.Configuration;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * Created by xiaoweiliang on 2019/1/17.
- */
 public class Config {
 
     private static Properties prop = new Properties();
