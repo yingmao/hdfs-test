@@ -21,7 +21,7 @@
 ![](pics/5.png)
 
 
-- Go to your instance page, follow the step to add your public key into your instance and save the changes. `Please check the line breaks when you paste the key from your laptop to Google Cloud. The system may false recognize your key into multiple ones if there are line breaks`. You can use `create similar` option to create instance 2 and 3.
+- Go to your instance page, follow the step to add your public key into your instance and save the changes. **`Please check the line breaks when pasting the key from your laptop to Google Cloud. The system may false recognize your key into multiple ones if there are line breaks`**. In addition, you can use `create similar` option to create instance 2 and 3.
 
 ![](pics/6.png)
 ![](pics/7.png)
