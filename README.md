@@ -68,6 +68,6 @@
 
 - You can use test.sh in the folder of hdfs-test-shell, hdfs-test-python and hdfs-test-java to test your cluster. 
 
-- <span style="color:red">some Don't forget to **stop or delete** your cloud instances after your experiments.</span>
+- <span style="color:red">Don't forget to **stop or delete** your cloud instances after your experiments.</span>
 
 ---
