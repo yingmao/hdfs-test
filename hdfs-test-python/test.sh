@@ -3,7 +3,7 @@ export PATH=$PATH:/usr/local/hadoop/bin/
 echo 'make a 1G file...'
 dd if=/dev/zero  of=file1g.data bs=1M count=1024
 echo "Startup Hadoop hdfs...."
-#启动hdfs
+#start hdfs
 /usr/local/hadoop/sbin/start-dfs.sh
 echo "Finished Startup Haoop hdfs"
 echo 'mkdir ...'
@@ -17,6 +17,6 @@ python hdfs-delete.py /testfile/
 echo 'Finished!'
 rm -rf file1g.data
 echo "Shutdown Hadoop hdfs..."
-#停止hdfs
+#stop hdfs
 /usr/local/hadoop/sbin/stop-dfs.sh
 echo "Finished Stop Hadoop hdfs"
