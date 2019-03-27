@@ -8,8 +8,8 @@ def writeHadoopConfigFile(name,xml):
     f.close()
 
 
-mf = open("master","r")
-sf = open("slaves","r")
+mf = open("manager","r")
+sf = open("workers","r")
 mip = mf.read().strip()
 sip = sf.read().replace("-","")
 mf.close()
@@ -144,10 +144,10 @@ yarnSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
 """ % dict(mip=mip)
 writeHadoopConfigFile("yarn-site.xml",yarnSiteXml)
 
-master = mip
-writeHadoopConfigFile("master",master)
-slaves = sip
-writeHadoopConfigFile("slaves",slaves)
+manager = mip
+writeHadoopConfigFile("manager",manager)
+workers = sip
+writeHadoopConfigFile("workers",workers)
 
 
 #format hdfs
