@@ -31,7 +31,7 @@ os.system("mkdir -p /data/hadoop/node && mkdir -p /data/hadoop/data && mkdir -p 
 
 if not os.path.exists("/hadoop-2.9.2.tar.gz"):
     print("Downloading Hadoop 2.9.2....")
-    os.system("curl -o hadoop-2.9.2.tar.gz http://apache.claz.org/hadoop/common/hadoop-2.9.2/hadoop-2.9.2.tar.gz")
+    os.system("curl -o hadoop-2.9.2.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-2.9.2/hadoop-2.9.2.tar.gz")
     print("Download Hadoop 2.9.2 Successful...")
 
 print("Install Hadoop 2.9.2 .....")
