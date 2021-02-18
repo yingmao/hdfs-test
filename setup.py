@@ -29,13 +29,13 @@ os.system("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
 #config dir
 os.system("mkdir -p /data/hadoop/node && mkdir -p /data/hadoop/data && mkdir -p /data/hadoop/name")
 
-if not os.path.exists("/hadoop-2.9.2.tar.gz"):
+if not os.path.exists("hadoop-2.9.2.tar.gz"):
     print("Downloading Hadoop 2.9.2....")
     os.system("curl -o hadoop-2.9.2.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-2.9.2/hadoop-2.9.2.tar.gz")
     print("Download Hadoop 2.9.2 Successful...")
 
 print("Install Hadoop 2.9.2 .....")
-os.system("tar -xzf /hadoop-2.9.2.tar.gz -C /usr/local/ && ln -s /usr/local/hadoop-2.9.2/ /usr/local/hadoop")
+os.system("tar -xzf hadoop-2.9.2.tar.gz -C /usr/local/ && ln -s /usr/local/hadoop-2.9.2/ /usr/local/hadoop")
 print("Finished Install Hadoop 2.9.2....")
 
 print("Config Hadoop 2.9.2 ...")
