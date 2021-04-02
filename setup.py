@@ -80,7 +80,7 @@ hdfsSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
     </property>
     <property>
         <name>dfs.replication</name>
-        <value>2</value>
+        <value>1</value>
     </property>
     <property>
         <name>dfs.namenode.name.dir</name>
