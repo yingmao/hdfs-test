@@ -20,7 +20,7 @@ os.system("cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys")
 os.system("apt-get update -y && apt-get install python -y && apt-get install -y default-jdk && apt-get install -y curl && apt-get install -y maven && apt-get install -y python-pip && apt-get install -y python3-pip && curl -fsSL -o- https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3.5 && hash -r && pip install --upgrade pip && pip install pyhdfs")
 
 #clear first
-os.system("rm -rf /usr/local/hadoop-2.9.2/ && unlink /usr/local/hadoop && rm -rf /data/hadoop/")
+os.system("rm -rf /usr/local/hadoop-3.3.1/ && unlink /usr/local/hadoop && rm -rf /data/hadoop/")
 os.system("sed -i /JAVA_HOME/d /root/.bashrc && sed -i /hadoop/d /root/.bashrc && sed -i /StrictHostKeyChecking/d /etc/ssh/ssh_config")
 
 #config env
@@ -31,16 +31,16 @@ os.system("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
 #config dir
 os.system("mkdir -p /data/hadoop/node && mkdir -p /data/hadoop/data && mkdir -p /data/hadoop/name")
 
-if not os.path.exists("hadoop-2.9.2.tar.gz"):
-    print("Downloading Hadoop 2.9.2....")
-    os.system("curl -o hadoop-2.9.2.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-2.9.2/hadoop-2.9.2.tar.gz")
-    print("Download Hadoop 2.9.2 Successful...")
+if not os.path.exists("hadoop-3.3.1.tar.gz"):
+    print("Downloading Hadoop 3.3.1....")
+    os.system("curl -o hadoop-3.3.1.tar.gz https://archive.apache.org/dist/hadoop/common/hadoop-3.3.1/hadoop-3.3.1.tar.gz")
+    print("Download Hadoop 3.3.1 Successful...")
 
-print("Install Hadoop 2.9.2 .....")
-os.system("tar -xzf hadoop-2.9.2.tar.gz -C /usr/local/ && ln -s /usr/local/hadoop-2.9.2/ /usr/local/hadoop")
-print("Finished Install Hadoop 2.9.2....")
+print("Install Hadoop 3.3.1 .....")
+os.system("tar -xzf hadoop-3.3.1.tar.gz -C /usr/local/ && ln -s /usr/local/hadoop-3.3.1/ /usr/local/hadoop")
+print("Finished Install Hadoop 3.3.1....")
 
-print("Config Hadoop 2.9.2 ...")
+print("Config Hadoop 3.3.1 ...")
 os.system("sed -i '/export JAVA_HOME/s/${JAVA_HOME}/\/usr\/lib\/jvm\/default-java\//g' /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
 
 #core-site.xml
