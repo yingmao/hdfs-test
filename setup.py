@@ -124,6 +124,22 @@ mapredSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
         <name>mapreduce.framework.name</name>
         <value>yarn</value>
     </property>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <property>
+        <name>yarn.app.mapreduce.am.env</name>
+        <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
+    </property>
+    <property>
+        <name>mapreduce.map.env</name>
+        <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
+    </property>
+    <property>
+        <name>mapreduce.reduce.env</name>
+        <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
+    </property>
 </configuration>
 """
 writeHadoopConfigFile("mapred-site.xml",mapredSiteXml)
