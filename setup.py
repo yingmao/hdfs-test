@@ -24,7 +24,7 @@ os.system("rm -rf /usr/local/hadoop-3.3.1/ && unlink /usr/local/hadoop && rm -rf
 os.system("sed -i /JAVA_HOME/d /root/.bashrc && sed -i /hadoop/d /root/.bashrc && sed -i /StrictHostKeyChecking/d /etc/ssh/ssh_config")
 
 #config env
-os.system("echo 'export JAVA_HOME=/usr/lib/jvm/default-java/' >> /root/.bashrc")
+os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/' >> /root/.bashrc")
 os.system("echo 'export PATH=$PATH:/usr/local/hadoop/bin/:/usr/local/hadoop/sbin/' >> /root/.bashrc")
 #config ssh
 os.system("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
@@ -42,6 +42,15 @@ print("Finished Install Hadoop 3.3.1....")
 
 print("Config Hadoop 3.3.1 ...")
 os.system("sed -i '/export JAVA_HOME/s/${JAVA_HOME}/\/usr\/lib\/jvm\/default-java\//g' /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
+
+
+os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/' >>  /usr/local/hadoop-3.3.1/etc/hadoop/hadoop-env.sh")
+os.system("echo 'export HDFS_NAMENODE_USER=root' >>  /usr/local/hadoop-3.3.1/etc/hadoop/hadoop-env.sh")
+os.system("echo 'export HDFS_DATANODE_USER=root' >>  /usr/local/hadoop-3.3.1/etc/hadoop/hadoop-env.sh")
+os.system("echo 'export HDFS_SECONDARYNAMENODE_USER=root' >>  /usr/local/hadoop-3.3.1/etc/hadoop/hadoop-env.sh")
+os.system("echo 'export YARN_RESOURCEMANAGER_USER=root' >>  /usr/local/hadoop-3.3.1/etc/hadoop/hadoop-env.sh")
+os.system("echo 'export YARN_NODEMANAGER_USER=root' >>  /usr/local/hadoop-3.3.1/etc/hadoop/hadoop-env.sh")
+
 
 #core-site.xml
 coreSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
