@@ -6,7 +6,7 @@ def writeHadoopConfigFile(name,xml):
     f = open("/usr/local/hadoop/etc/hadoop/" + name,"w")
     f.write(xml)
     f.close()
-    print("Finished Config: " + xml) 
+    print("Finished Config: " + name) 
 
 
 mf = open("manager","r")
