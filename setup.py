@@ -59,7 +59,12 @@ os.system("echo 'export HDFS_DATANODE_USER=root' >>  /usr/local/hadoop/etc/hadoo
 os.system("echo 'export HDFS_SECONDARYNAMENODE_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
 os.system("echo 'export YARN_RESOURCEMANAGER_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
 os.system("echo 'export YARN_NODEMANAGER_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
+	  
+os.system("echo 'export HADOOP_HOME=/usr/local/hadoop' >> /root/.bashrc")
+os.system("source ~/.bashrc")
 
+	  
+	  
 
 #core-site.xml
 coreSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
