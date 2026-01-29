@@ -16,7 +16,7 @@ sip = sf.read().replace("-","")
 mf.close()
 sf.close()
 
-os.system("cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys")
+os.system("cat ~.ssh/id_rsa.pub >> ~.ssh/authorized_keys")
 
 os.system("apt-get update -y && apt-get install python -y && apt-get install -y default-jdk && apt-get install -y curl && apt-get install -y maven && apt-get install -y python-pip && apt-get install -y python3-pip && curl -fsSL -o- https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3.5 && hash -r && pip install --upgrade pip")
 
@@ -25,7 +25,7 @@ os.system("rm -rf /usr/local/hadoop-3.3.1/ && unlink /usr/local/hadoop && rm -rf
 os.system("sed -i /JAVA_HOME/d /root/.bashrc && sed -i /hadoop/d /root/.bashrc && sed -i /StrictHostKeyChecking/d /etc/ssh/ssh_config")
 
 #config env
-os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/' >> /root/.bashrc")
+os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64/' >> /root/.bashrc")
 os.system("echo 'export PATH=$PATH:/usr/local/hadoop/bin/:/usr/local/hadoop/sbin/' >> /root/.bashrc")
 #config ssh
 os.system("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
