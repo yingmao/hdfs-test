@@ -1,210 +1,194 @@
+import argparse
+import ipaddress
 import os
-import sys, socket
+import subprocess
+from pathlib import Path
+from typing import List
+
+HADOOP_VER = "3.4.2"
+BASE_DIR = Path("/hdfs-test")
+
+MANAGER_FILE = BASE_DIR / "manager"
+WORKERS_FILE = BASE_DIR / "workers"
+HADOOP_TGZ = BASE_DIR / f"hadoop-{HADOOP_VER}.tar.gz"
+
+HADOOP_INSTALL_DIR = Path(f"/usr/local/hadoop-{HADOOP_VER}")
+HADOOP_SYMLINK = Path("/usr/local/hadoop")
+HADOOP_CONF_DIR = HADOOP_SYMLINK / "etc/hadoop"
+
+DATA_DIR = Path("/data/hadoop")
+JAVA_HOME = "/usr/lib/jvm/java-21-openjdk-amd64"
 
 
-def writeHadoopConfigFile(name,xml):
-    f = open("/usr/local/hadoop/etc/hadoop/" + name,"w")
-    f.write(xml)
-    f.close()
-    print("Finished Config: " + name) 
+def sh(cmd: str, check: bool = True) -> None:
+    print(f"[CMD] {cmd}")
+    subprocess.run(cmd, shell=True, check=check)
 
 
-mf = open("manager","r")
-sf = open("workers","r")
-mip = mf.read().strip()
-sip = sf.read().replace("-","")
-mf.close()
-sf.close()
-
-os.system("su root")
-
-os.system("cat ~.ssh/*.pub >> ~.ssh/authorized_keys")
-
-os.system("apt-get update -y && apt-get install python3 -y && sudo apt install python-is-python3 && sudo apt install openjdk-21-jdk-headless -y && apt-get install -y curl && apt-get install -y maven && curl -fsSL -o- https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3.5 && hash -r && pip install --upgrade pip")
-
-#clear first
-os.system("rm -rf /usr/local/hadoop-3.4.2/ && unlink /usr/local/hadoop && rm -rf /data/hadoop/")
-os.system("sed -i /JAVA_HOME/d /root/.bashrc && sed -i /hadoop/d /root/.bashrc && sed -i /StrictHostKeyChecking/d /etc/ssh/ssh_config")
-
-#config env
-os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64/' >> /root/.bashrc")
-os.system("echo 'export PATH=$PATH:/usr/local/hadoop/bin/:/usr/local/hadoop/sbin/' >> /root/.bashrc")
-#config ssh
-os.system("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
-#config dir
-os.system("mkdir -p /data/hadoop/node && mkdir -p /data/hadoop/data && mkdir -p /data/hadoop/name")
-
-if not os.path.exists("hadoop-3.4.2.tar.gz"):
-    print("Downloading Hadoop 3.4.2....")
-    os.system("curl -o hadoop-3.4.2.tar.gz https://archive.apache.org/dist/hadoop/common/current/hadoop-3.4.2.tar.gz")
-    print("Download Hadoop 3.4.2 Successful...")
-
-print("Install Hadoop 3.4.2 .....")
-os.system("tar -xzf hadoop-3.4.2.tar.gz -C /usr/local/ && ln -s /usr/local/hadoop-3.4.2/ /usr/local/hadoop")
-print("Finished Install Hadoop 3.4.2....")
-
-print("Config Hadoop 3.4.2 ...")
-os.system("sed -i '/export JAVA_HOME/s/${JAVA_HOME}/\/usr\/lib\/jvm\/default-java\//g' /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
+def write_file(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content)
+    print(f"Finished Config: {path}")
 
 
-os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/' >>  /usr/local/hadoop-3.4.2/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export HDFS_NAMENODE_USER=root' >>  /usr/local/hadoop-3.4.2/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export HDFS_DATANODE_USER=root' >>  /usr/local/hadoop-3.4.2/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export HDFS_SECONDARYNAMENODE_USER=root' >>  /usr/local/hadoop-3.4.2/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export YARN_RESOURCEMANAGER_USER=root' >>  /usr/local/hadoop-3.4.2/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export YARN_NODEMANAGER_USER=root' >>  /usr/local/hadoop-3.4.2/etc/hadoop/hadoop-env.sh")
+def read_manager_ip() -> str:
+    mip = MANAGER_FILE.read_text(encoding="utf-8", errors="replace").strip()
+    ipaddress.ip_address(mip)
+    return mip
 
-os.system("echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export HDFS_NAMENODE_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export HDFS_DATANODE_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export HDFS_SECONDARYNAMENODE_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export YARN_RESOURCEMANAGER_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
-os.system("echo 'export YARN_NODEMANAGER_USER=root' >>  /usr/local/hadoop/etc/hadoop/hadoop-env.sh")
-	  
-os.system("echo 'export HADOOP_HOME=/usr/local/hadoop' >> /root/.bashrc")
-os.system("source ~/.bashrc")
-os.system("pip install pyhdfs")	  
-	  
 
-#core-site.xml
-coreSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+def read_worker_ips() -> List[str]:
+    # simple + robust enough: handles CRLF, whitespace, BOM/NBSP
+    text = WORKERS_FILE.read_bytes().decode("utf-8", errors="replace")
+    ips: List[str] = []
+
+    for line in text.splitlines():
+        s = line.replace("\ufeff", "").replace("\u00a0", " ").replace("\r", "").strip()
+        if not s or s == "-" or s.startswith("#"):
+            continue
+        try:
+            ipaddress.ip_address(s)
+            ips.append(s)
+        except ValueError:
+            print(f"[WARN] Ignoring non-IP line in workers: {s!r}")
+
+    return ips
+
+
+def ensure_root() -> None:
+    if os.geteuid() != 0:
+        raise SystemExit("Run as root (lab): ssh root@node ...")
+
+
+def setup_root_ssh_keys_local() -> None:
+    # local-only convenience (does not distribute keys)
+    sh("mkdir -p /root/.ssh")
+    sh("chmod 700 /root/.ssh")
+    sh("touch /root/.ssh/authorized_keys")
+    sh("chmod 600 /root/.ssh/authorized_keys")
+    sh("sh -c 'cat /root/.ssh/*.pub 2>/dev/null | sort -u >> /root/.ssh/authorized_keys'", check=False)
+    sh("sh -c 'sort -u /root/.ssh/authorized_keys -o /root/.ssh/authorized_keys'", check=False)
+
+
+def install_deps() -> None:
+    sh("apt-get update -y")
+    sh("apt-get install -y curl maven python3 python-is-python3 openjdk-21-jdk-headless openssh-client")
+
+
+def install_hadoop() -> None:
+    sh(f"rm -rf {HADOOP_INSTALL_DIR} {DATA_DIR} || true", check=False)
+    sh(f"rm -f {HADOOP_SYMLINK} || true", check=False)
+
+    sh(f"mkdir -p {DATA_DIR}/node {DATA_DIR}/data {DATA_DIR}/name")
+
+    if not HADOOP_TGZ.exists():
+        sh(
+            f"curl -L -o {HADOOP_TGZ} "
+            f"https://archive.apache.org/dist/hadoop/common/hadoop-{HADOOP_VER}/hadoop-{HADOOP_VER}.tar.gz"
+        )
+
+    sh(f"tar -xzf {HADOOP_TGZ} -C /usr/local/")
+    sh(f"ln -s {HADOOP_INSTALL_DIR} {HADOOP_SYMLINK}")
+
+
+def configure_hadoop_env() -> None:
+    env_path = HADOOP_CONF_DIR / "hadoop-env.sh"
+
+    sh(f"sed -i '/^export JAVA_HOME=/d' {env_path}", check=False)
+    sh(f"printf '\\nexport JAVA_HOME={JAVA_HOME}\\n' >> {env_path}")
+
+    for k in (
+        "HDFS_NAMENODE_USER",
+        "HDFS_DATANODE_USER",
+        "HDFS_SECONDARYNAMENODE_USER",
+        "YARN_RESOURCEMANAGER_USER",
+        "YARN_NODEMANAGER_USER",
+    ):
+        sh(f"sed -i '/^export {k}=/d' {env_path}", check=False)
+        sh(f"printf 'export {k}=root\\n' >> {env_path}")
+
+
+def write_hadoop_configs(mip: str, workers: List[str]) -> None:
+    write_file(HADOOP_CONF_DIR / "workers", "\n".join(workers) + ("\n" if workers else ""))
+
+    core_site = f"""<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Default HDFS ip and port -->
-    <property>
-         <name>fs.defaultFS</name>
-         <value>hdfs://%(mip)s:9000</value>
-    </property>
-    <!-- default RPC IP，and use 0.0.0.0 to represent all ips-->
-    <property>
-	<name>dfs.namenode.rpc-bind-host</name>
-	<value>0.0.0.0</value>
-    </property>
-</configuration>""" % dict(mip=mip)
-writeHadoopConfigFile("core-site.xml",coreSiteXml)
-hdfsSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-
-
-    <property>
-       <name>dfs.permissions</name>
-      <value>false</value>
-   </property>
-
-    <property>
-        <name>dfs.namenode.http-address</name>
-        <value>0.0.0.0:50070</value>
-    </property>
-
-    <property>
-        <name>dfs.namenode.secondary.http-address</name>
-        <value>0.0.0.0:50090</value>
-    </property>
-    <property>
-        <name>dfs.replication</name>
-        <value>1</value>
-    </property>
-    <property>
-        <name>dfs.namenode.name.dir</name>
-        <value>/data/hadoop/name</value>
-    </property>
-    <property>
-        <name>dfs.datanode.data.dir</name>
-        <value>/data/hadoop/data</value>
-    </property>
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://{mip}:9000</value>
+  </property>
+  <property>
+    <name>dfs.namenode.rpc-bind-host</name>
+    <value>0.0.0.0</value>
+  </property>
 </configuration>
 """
-writeHadoopConfigFile("hdfs-site.xml",hdfsSiteXml)
+    write_file(HADOOP_CONF_DIR / "core-site.xml", core_site)
 
-mapredSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    hdfs_site = """<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property>
-        <name>mapreduce.framework.name</name>
-        <value>yarn</value>
-    </property>
-    <property>
-        <name>mapreduce.framework.name</name>
-        <value>yarn</value>
-    </property>
-    <property>
-        <name>yarn.app.mapreduce.am.env</name>
-        <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
-    </property>
-    <property>
-        <name>mapreduce.map.env</name>
-        <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
-    </property>
-    <property>
-        <name>mapreduce.reduce.env</name>
-        <value>HADOOP_MAPRED_HOME=${HADOOP_HOME}</value>
-    </property>
-    
-    <property>
- <name>yarn.app.mapreduce.am.env</name>
- <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
-</property>
-<property>
- <name>mapreduce.map.env</name>
- <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
-</property>
-<property>
- <name>mapreduce.reduce.env</name>
- <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
-</property>
-    
-    
+  <property>
+    <name>dfs.permissions</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>dfs.replication</name>
+    <value>1</value>
+  </property>
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>/data/hadoop/name</value>
+  </property>
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>/data/hadoop/data</value>
+  </property>
 </configuration>
 """
-writeHadoopConfigFile("mapred-site.xml",mapredSiteXml)
-
-yarnSiteXml = """<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-    <property>
-        <name>yarn.resourcemanager.hostname</name>
-        <value>%(mip)s</value>
-    </property>
-
-    <property>
-        <name>yarn.nodemanager.aux-services</name>
-        <value>mapreduce_shuffle</value>
-    </property>
-
-    <property>
-         <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
-         <value>org.apache.hadoop.mapred.ShuffleHandler</value>
-    </property>
-  <property>
-    <name>yarn.resourcemanager.address</name>
-    <value>%(mip)s:8032</value>
-  </property>
-  <property>
-     <name>yarn.resourcemanager.scheduler.address</name>
-     <value>%(mip)s:8030</value>
-  </property>
-  <property>
-     <name>yarn.resourcemanager.resource-tracker.address</name>
-     <value>%(mip)s:8031</value>
-  </property>
-  <property>
-     <name>yarn.resourcemanager.admin.address</name>
-     <value>0.0.0.0:8033</value>
-   </property>
-   <property>
-      <name>yarn.resourcemanager.webapp.address</name>
-      <value>0.0.0.0:8088</value>
-   </property>
-</configuration>
-""" % dict(mip=mip)
-writeHadoopConfigFile("yarn-site.xml",yarnSiteXml)
-
-manager = mip
-writeHadoopConfigFile("manager",manager)
-workers = sip
-writeHadoopConfigFile("workers",workers)
+    write_file(HADOOP_CONF_DIR / "hdfs-site.xml", hdfs_site)
 
 
-#format hdfs
-os.system("/usr/local/hadoop/bin/hdfs namenode -format")
+def verify_install() -> None:
+    if not (HADOOP_INSTALL_DIR / "bin/hdfs").exists():
+        raise SystemExit(f"[FATAL] Missing {HADOOP_INSTALL_DIR}/bin/hdfs")
+    if not HADOOP_SYMLINK.exists():
+        raise SystemExit("[FATAL] Missing /usr/local/hadoop symlink")
+
+
+def format_namenode_if_manager(role: str) -> None:
+    if role != "manager":
+        print("Worker node: skip NameNode format.")
+        return
+
+    if (DATA_DIR / "name/current").exists():
+        print("NameNode already formatted; skipping.")
+        return
+
+    sh(f"{HADOOP_SYMLINK}/bin/hdfs namenode -format -nonInteractive")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--role", required=True, choices=["manager", "worker"])
+    args = ap.parse_args()
+
+    ensure_root()
+
+    mip = read_manager_ip()
+    workers = read_worker_ips()
+
+    print(f"Role: {args.role}")
+    print(f"Manager IP: {mip}")
+    print(f"Workers: {workers}")
+
+    install_deps()
+    setup_root_ssh_keys_local()
+    install_hadoop()
+    configure_hadoop_env()
+    write_hadoop_configs(mip, workers)
+    verify_install()
+    format_namenode_if_manager(args.role)
+
+
+if __name__ == "__main__":
+    main()
