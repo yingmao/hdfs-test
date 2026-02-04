@@ -4,7 +4,7 @@ echo 'make a 1G file...'
 dd if=/dev/zero  of=file1g.data bs=1M count=1024
 echo "Startup Hadoop hdfs...."
 #start hdfs
-/usr/local/hadoop/sbin/start-dfs.sh
+/usr/local/hadoop/sbin/start-all.sh
 echo "Finished Startup Haoop hdfs"
 echo 'mkdir ...'
 hdfs dfs -mkdir /testfile/
